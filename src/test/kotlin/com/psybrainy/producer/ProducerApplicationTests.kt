@@ -12,7 +12,7 @@ import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.TimeUnit
 
 @SpringBootTest
-@EmbeddedKafka(partitions = 1, topics = ["hola"])
+@EmbeddedKafka(partitions = 1, topics = ["test-topic"])
 class ProducerApplicationTests {
 
 	@Autowired
@@ -20,7 +20,7 @@ class ProducerApplicationTests {
 
 	private val records: BlockingQueue<String> = LinkedBlockingQueue()
 
-	@KafkaListener(topics = ["hola"], groupId = "consumer_group_id" )
+	@KafkaListener(topics = ["test-topic"], groupId = "consumer_group_id" )
 	fun listen(record: ConsumerRecord<String, String>) {
 		records.add(record.value())
 	}

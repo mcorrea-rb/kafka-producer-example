@@ -6,13 +6,12 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping
-class Controler(
+class Controller(
     val producerKafkaService: ProducerKafkaService
 ) {
 
     @PostMapping("/kafka")
     fun kafka() {
-
         producerKafkaService.execute("Hello Kafka!")
     }
 }

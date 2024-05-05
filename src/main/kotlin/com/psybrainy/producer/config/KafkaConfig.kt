@@ -21,6 +21,7 @@ class KafkaConfig {
     fun kafkaTemplate(pf: ProducerFactory<String, String>): KafkaTemplate<String, String> {
         return KafkaTemplate(pf, mapOf(
             ProducerConfig.BOOTSTRAP_SERVERS_CONFIG to bootstrapServers,
+
             ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG to StringSerializer::class.java,
             ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG to StringSerializer::class.java
         ))

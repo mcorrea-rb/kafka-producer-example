@@ -10,9 +10,8 @@ class ProducerKafkaService(
 ) {
 
     fun execute(message: String) {
-        val topic = "hola"
+        val topic = "test-topic"
         try {
-
             log.info("Send risk assessment response: {} to Kafka topic: {}", message, topic)
             messageProducer.sendMessage(topic, message)
             log.info("Risk assessment response: {} sent to Kafka topic: {}", message, topic)
