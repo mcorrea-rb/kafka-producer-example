@@ -10,6 +10,7 @@ class MessageProducer {
 
     @Autowired
     private val kafkaTemplate: KafkaTemplate<String, String>? = null
+
     fun sendMessage(topic: String?, message: String) {
         log.info("Sending message to Kafka topic: $topic, message: $message")
         kafkaTemplate?.send(topic!!, message)

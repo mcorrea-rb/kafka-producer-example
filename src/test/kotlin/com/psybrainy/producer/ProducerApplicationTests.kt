@@ -30,7 +30,8 @@ class ProducerApplicationTests {
 	@BeforeEach
 	fun setup() {
 		val consumerProps: MutableMap<String, Any> = KafkaTestUtils.consumerProps(
-			"consumer_group_id", "true",
+			"consumer_group_id",
+			"true",
 			broker
 		)
 		consumerProps[ConsumerConfig.AUTO_OFFSET_RESET_CONFIG] = "earliest"
@@ -43,7 +44,6 @@ class ProducerApplicationTests {
 	fun `test send message integrates with Kafka`() {
 
 		val testMessage = "Hello Kafka!"
-
 		producerKafkaService.execute(testMessage)
 
 		val replies: ConsumerRecords<String, String> = KafkaTestUtils.getRecords(consumer)
