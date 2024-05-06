@@ -1,15 +1,19 @@
 package com.psybrainy.producer
 
 import com.psybrainy.producer.service.ProducerKafkaService
-import org.apache.kafka.clients.consumer.ConsumerRecord
+import org.apache.kafka.clients.consumer.Consumer
+import org.apache.kafka.clients.consumer.ConsumerConfig
+import org.apache.kafka.clients.consumer.ConsumerRecords
+import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.kafka.annotation.KafkaListener
+import org.springframework.kafka.core.ConsumerFactory
+import org.springframework.kafka.core.DefaultKafkaConsumerFactory
+import org.springframework.kafka.test.EmbeddedKafkaBroker
 import org.springframework.kafka.test.context.EmbeddedKafka
-import java.util.concurrent.BlockingQueue
-import java.util.concurrent.LinkedBlockingQueue
-import java.util.concurrent.TimeUnit
+import org.springframework.kafka.test.utils.KafkaTestUtils
 
 @SpringBootTest
 @EmbeddedKafka(partitions = 1, topics = ["test-topic"])
@@ -18,20 +22,34 @@ class ProducerApplicationTests {
 	@Autowired
 	private lateinit var producerKafkaService: ProducerKafkaService
 
-	private val records: BlockingQueue<String> = LinkedBlockingQueue()
+	@Autowired
+	private lateinit var broker: EmbeddedKafkaBroker
 
-	@KafkaListener(topics = ["test-topic"], groupId = "consumer_group_id" )
-	fun listen(record: ConsumerRecord<String, String>) {
-		records.add(record.value())
+	private lateinit var consumer: Consumer<String, String>
+
+	@BeforeEach
+	fun setup() {
+		val consumerProps: MutableMap<String, Any> = KafkaTestUtils.consumerProps(
+			"consumer_group_id", "true",
+			broker
+		)
+		consumerProps[ConsumerConfig.AUTO_OFFSET_RESET_CONFIG] = "earliest"
+		val cf: ConsumerFactory<String, String> = DefaultKafkaConsumerFactory(consumerProps)
+		consumer = cf.createConsumer()
+		broker.consumeFromAnEmbeddedTopic(consumer, "test-topic")
 	}
 
 	@Test
 	fun `test send message integrates with Kafka`() {
+
 		val testMessage = "Hello Kafka!"
+
 		producerKafkaService.execute(testMessage)
 
-		val receivedMessage = records.poll(10, TimeUnit.SECONDS)
-		assert(testMessage == receivedMessage)
-	}
+		val replies: ConsumerRecords<String, String> = KafkaTestUtils.getRecords(consumer)
 
+		assertThat(replies.count()).isGreaterThanOrEqualTo(1)
+		assertThat(replies.first().value()).isEqualTo(testMessage)
+	}
 }
+
