@@ -11,7 +11,7 @@ class Controller(
 ) {
 
     @PostMapping("/kafka")
-    fun kafka() {
+    suspend fun kafka() {
         producerKafkaService.execute("Hello Kafka!")
     }
 }

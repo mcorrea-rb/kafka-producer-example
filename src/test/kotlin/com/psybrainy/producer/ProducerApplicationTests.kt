@@ -1,6 +1,7 @@
 package com.psybrainy.producer
 
 import com.psybrainy.producer.service.ProducerKafkaService
+import kotlinx.coroutines.test.runTest
 import org.apache.kafka.clients.consumer.Consumer
 import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.kafka.clients.consumer.ConsumerRecords
@@ -41,7 +42,7 @@ class ProducerApplicationTests {
 	}
 
 	@Test
-	fun `test send message integrates with Kafka`() {
+	fun `test send message integrates with Kafka`() = runTest {
 
 		val testMessage = "Hello Kafka!"
 		producerKafkaService.execute(testMessage)
